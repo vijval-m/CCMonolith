@@ -20,16 +20,17 @@ def get_cart(username: str) -> list:
     cart_details = dao.get_cart(username)
     if cart_details is None:
         return []
-    
-    items = [
-        item
-        for cart_detail in cart_details
-        for item in eval(cart_detail['contents'])
-    ]
 
+    items = []
+    for cart_detail in cart_details:
+        contents = cart_detail['contents']
+        try:
+            evaluated_contents = json.loads(contents)
+            items.extend(evaluated_contents)
+        except json.JSONDecodeError:
+            continue
 
-
-    return [products.get_product(item) for item in items]
+    return [products.get_product(i) for i in items]
 
 
 
